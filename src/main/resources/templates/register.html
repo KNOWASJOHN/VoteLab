@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Voting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/background/bg.css}">
+</head>
+
+<body class="page page-center" style="background:#050b16;">
+    <div id="sky" data-stars="50"></div>
+    <script src='https://unpkg.com/gsap@3/dist/gsap.min.js'></script>
+    <script th:src="@{/background/bg.js}"></script>
+    <div class="card card-narrow">
+            <h1>Create Account</h1>
+            <p class="muted">Register to vote. Password must be at least 8 characters.</p>
+            <form method="post" action="/register" class="stack">
+                <label class="field">
+                    <span>Username</span>
+                    <input type="text" name="username" required autocomplete="username">
+                </label>
+                <label class="field">
+                    <span>Password</span>
+                    <input type="password" name="password" minlength="8" required autocomplete="new-password">
+                </label>
+                <button type="submit" class="btn primary">Sign up</button>
+            </form>
+            <div class="messages">
+                <p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+                <p th:if="${infoMessage}" class="alert alert-info" th:text="${infoMessage}"></p>
+            </div>
+            <p class="muted">Already have an account? <a href="/login" class="link">Login</a></p>
+    </div>
+</body>
+
+</html>

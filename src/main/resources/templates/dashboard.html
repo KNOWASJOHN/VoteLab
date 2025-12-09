@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Voting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+    <canvas id="canvas"></canvas>
+    <script type="module" th:src="@{/scripts/tube.js}"></script>
+    <header class="topbar">
+        <div class="brand">Voting App</div>
+        <div class="actions">
+            <a th:if="${isAdmin}" href="/admin" class="link">Admin</a>
+            <a href="/logout" class="link">Logout</a>
+        </div>
+    </header>
+    <main class="content">
+        <section class="panel">
+            <h2>Candidates</h2>
+            <div class="grid grid-4">
+                <div class="card" th:each="c : ${candidates}">
+                    <div class="card-header">
+                        <div>
+                            <div class="title" th:text="${c.name}"></div>
+                            <div class="muted" th:text="${c.party}"></div>
+                        </div>
+                        <div class="badge" th:text="${c.age} + ' yrs'"></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="media">
+                            <img class="avatar"
+                                th:src="${c != null && c.pictureUrl != null ? c.pictureUrl : 'https://via.placeholder.com/400x250?text=No+Image'}"
+                                alt="Candidate photo">
+                            <img class="logo"
+                                th:src="${c != null && c.partyLogoUrl != null ? c.partyLogoUrl : 'https://via.placeholder.com/80?text=Logo'}"
+                                alt="Party logo">
+                        </div>
+                        <p th:text="${c.description}"></p>
+                    </div>
+                    <div class="card-footer">
+                        <form th:if="${!isAdmin}" method="post" action="/vote">
+                            <input type="hidden" name="candidateId" th:value="${c.id}">
+                            <button type="submit" class="btn primary" th:disabled="${vote != null}"
+                                th:text="${vote != null ? 'Vote locked' : 'Vote for ' + c.name}"></button>
+                        </form>
+                        <div th:if="${isAdmin}" class="muted">Admins cannot vote.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section th:if="${isAdmin}" class="panel">
+            <h2>Vote counts</h2>
+            <p class="muted">Admin-only view of current totals.</p>
+            <div class="pill" th:text="${(totalVotes != null ? totalVotes : 0) + ' total votes cast'}"></div>
+            <div class="grid grid-4">
+                <div class="card" th:each="c : ${candidates}">
+                    <div class="card-header">
+                        <div>
+                            <div class="title" th:text="${c.name}"></div>
+                            <div class="muted" th:text="${c.party}"></div>
+                        </div>
+                        <div class="pill"
+                            th:text="${(voteCounts != null && voteCounts[c.id] != null) ? voteCounts[c.id] + ' votes' : '0 votes'}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section th:if="${!isAdmin}" class="panel">
+            <h2>Your vote</h2>
+            <p th:if="${vote == null}" class="muted">You have not voted yet.</p>
+            <p th:if="${vote != null}" class="success"
+                th:text="${'You voted for ' + vote.candidateName + ' at ' + vote.votedAt}"></p>
+            <div class="messages">
+                <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+                <p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

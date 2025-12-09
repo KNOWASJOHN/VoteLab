@@ -1,0 +1,26 @@
+#sky {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: Georgia, serif;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background: #050b16;
+  color: white;
+  overflow-x: hidden;
+}

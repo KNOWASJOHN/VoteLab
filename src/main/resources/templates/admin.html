@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Voting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="page">
+    <canvas id="canvas"></canvas>
+    <script type="module" th:src="@{/scripts/tube.js}"></script>
+    <header class="topbar">
+        <div class="brand">Admin Panel</div>
+        <div class="actions">
+            <a href="/" class="link">Dashboard</a>
+            <a href="/logout" class="link">Logout</a>
+        </div>
+    </header>
+    <main class="content">
+        <section class="panel">
+            <h2>Vote counts</h2>
+            <p class="muted">Only visible to admins.</p>
+            <div class="pill" th:text="${(totalVotes != null ? totalVotes : 0) + ' total votes cast'}"></div>
+            <div class="grid grid-4">
+                <div class="card" th:each="c : ${candidates}">
+                    <div class="card-header">
+                        <div>
+                            <div class="title" th:text="${c.name}"></div>
+                            <div class="muted" th:text="${c.party}"></div>
+                        </div>
+                        <div class="pill"
+                            th:text="${(voteCounts != null && voteCounts[c.id] != null) ? voteCounts[c.id] + ' votes' : '0 votes'}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Create candidate</h2>
+            <form method="post" action="/admin/candidates" class="stack">
+                <div class="grid grid-2">
+                    <label class="field">
+                        <span>Name</span>
+                        <input type="text" name="name" required th:value="${candidateForm.name}">
+                    </label>
+                    <label class="field">
+                        <span>Age (18+)</span>
+                        <input type="number" name="age" min="18" required th:value="${candidateForm.age}">
+                    </label>
+                </div>
+                <div class="grid grid-2">
+                    <label class="field">
+                        <span>Party</span>
+                        <input type="text" name="party" required th:value="${candidateForm.party}">
+                    </label>
+                    <label class="field">
+                        <span>Party logo URL (jpg/png)</span>
+                        <input type="url" name="partyLogoUrl" required th:value="${candidateForm.partyLogoUrl}">
+                    </label>
+                </div>
+                <label class="field">
+                    <span>Picture URL (jpg/png)</span>
+                    <input type="url" name="pictureUrl" required th:value="${candidateForm.pictureUrl}">
+                </label>
+                <label class="field">
+                    <span>Description</span>
+                    <textarea name="description" rows="3" th:text="${candidateForm.description}"></textarea>
+                </label>
+                <button type="submit" class="btn primary">Create</button>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>Manage candidates</h2>
+            <div class="messages">
+                <p th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></p>
+                <p th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></p>
+            </div>
+            <div class="list" th:if="${#lists.isEmpty(candidates)}">
+                <p class="muted">No candidates yet.</p>
+            </div>
+            <div class="grid grid-4" th:if="${!#lists.isEmpty(candidates)}">
+                <div class="card" th:each="c : ${candidates}">
+                    <div class="card-header">
+                        <div>
+                            <div class="title" th:text="${c.name}"></div>
+                            <div class="muted" th:text="${c.party}"></div>
+                        </div>
+                        <div class="badge" th:text="${c.age} + ' yrs'"></div>
+                    </div>
+                    <div class="media admin-media">
+                        <img class="avatar"
+                            th:src="${c != null && c.pictureUrl != null ? c.pictureUrl : 'https://via.placeholder.com/400x250?text=No+Image'}"
+                            alt="Candidate photo">
+                        <img class="logo"
+                            th:src="${c != null && c.partyLogoUrl != null ? c.partyLogoUrl : 'https://via.placeholder.com/80?text=Logo'}"
+                            alt="Party logo">
+                    </div>
+                    <form method="post" th:action="@{'/admin/candidates/' + ${c.id} + '/update'}" class="stack">
+                        <div class="grid grid-2">
+                            <label class="field">
+                                <span>Name</span>
+                                <input type="text" name="name" required th:value="${c.name}">
+                            </label>
+                            <label class="field">
+                                <span>Age</span>
+                                <input type="number" name="age" min="18" required th:value="${c.age}">
+                            </label>
+                        </div>
+                        <div class="grid grid-2">
+                            <label class="field">
+                                <span>Party</span>
+                                <input type="text" name="party" required th:value="${c.party}">
+                            </label>
+                            <label class="field">
+                                <span>Party logo URL</span>
+                                <input type="url" name="partyLogoUrl" required th:value="${c.partyLogoUrl}">
+                            </label>
+                        </div>
+                        <label class="field">
+                            <span>Picture URL</span>
+                            <input type="url" name="pictureUrl" required th:value="${c.pictureUrl}">
+                        </label>
+                        <label class="field">
+                            <span>Description</span>
+                            <textarea name="description" rows="3" th:text="${c.description}"></textarea>
+                        </label>
+                        <div class="row">
+                            <button type="submit" class="btn primary">Save</button>
+                        </div>
+                    </form>
+                    <form th:action="@{'/admin/candidates/' + ${c.id} + '/delete'}" method="post" class="row">
+                        <button type="submit" class="btn danger"
+                            onclick="return confirm('Delete candidate?')">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>
